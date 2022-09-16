@@ -6,7 +6,8 @@ const JWT=require("jsonwebtoken");
 //Register Section
 router.post("/register",async(req,res)=>{
     const newUser=new User({
-        userName:req.body.userName,
+        firstName:req.body.firstName,
+        lastName:req.body.lastName,
         email:req.body.email,
         password:CryptoJS.AES.encrypt(              ///Encryption for User Password
             req.body.password,
@@ -16,8 +17,11 @@ router.post("/register",async(req,res)=>{
 
     try{
         const savedUser=await newUser.save();
+        console.log(savedUser);
+        console.log("User Register Successfully")
         res.status(201).json(savedUser);
     }catch(err){
+        console.log(err);
         res.status(500).json(err);
     }
 });
@@ -27,7 +31,7 @@ router.post("/register",async(req,res)=>{
 router.post("/login",async(req,res)=>{
     
     try{
-        const user=await User.findOne({userName:req.body.userName});
+        const user=await User.findOne({userName:req.body.email});
 
         !user && res.status(401).json("Wrong Credentials");
 
