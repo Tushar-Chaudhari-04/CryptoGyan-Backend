@@ -31,8 +31,12 @@ router.post("/register",async(req,res)=>{
 router.post("/login",async(req,res)=>{
     
     try{
-        const user=await User.findOne({userName:req.body.email});
-
+        if(req.body.email!=null){
+            const user=await User.findOne({userName:req.body.email});
+        }else{
+            res.status(402).json("Email is Not Given")
+        }
+        
         !user && res.status(401).json("Wrong Credentials");
 
         const hashPassword=CryptoJS.AES.decrypt(
@@ -41,8 +45,13 @@ router.post("/login",async(req,res)=>{
         );
 
         const OriginalPassword=hashPassword.toString(CryptoJS.enc.Utf8);
-        OriginalPassword!=req.body.password &&
-        res.status(401).json("Wrong Credentials are given.Please provide valid Credentials");
+        if(req.body.password!=null){
+            OriginalPassword!=req.body.password &&
+            res.status(401).json("Wrong Credentials are given.Please provide valid Credentials");
+        }else{
+            res.status(402).json("Password not Given")
+        }
+       
         
         const accessToken=JWT.sign(
         {
@@ -54,7 +63,7 @@ router.post("/login",async(req,res)=>{
 
         const {password,...others}=user._doc;
 
-        res.status(200).json({...others,accessToken});
+        res.status(201).json({...others,accessToken});
 
     }catch(err){
         res.status(500).json(err);
